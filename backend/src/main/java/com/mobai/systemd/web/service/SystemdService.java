@@ -1,6 +1,7 @@
 package com.mobai.systemd.web.service;
 
 import com.mobai.systemd.web.entity.ServiceUnitInfo;
+import com.mobai.systemd.web.entity.ServiceUnitOperation;
 
 import java.util.List;
 
@@ -20,6 +21,9 @@ public interface SystemdService {
 
 	/**
 	 * 操作服务单元
+	 *
+	 * @param serviceUnitOperation 服务单元操作
+	 * @return 是否操作成功
 	 */
-	boolean operateServiceUnit(String level, String operation, String unitName);
+	boolean operateServiceUnit(ServiceUnitOperation serviceUnitOperation);
 }
