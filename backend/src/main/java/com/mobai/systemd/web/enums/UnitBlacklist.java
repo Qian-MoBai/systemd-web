@@ -6,7 +6,7 @@ package com.mobai.systemd.web.enums;
  * @author Qian-MoBai
  */
 
-public enum ServiceBlacklist {
+public enum UnitBlacklist {
 	SYSTEMD("systemd"),
 	DBUS("dbus"),
 	UDEVADM("udevadm"),
@@ -14,13 +14,13 @@ public enum ServiceBlacklist {
 	NETWORK_MANAGER("network-manager"),
 	LOGIND("logind");
 
-	private final String serviceName;
+	private final String unitName;
 
-	ServiceBlacklist(String serviceName) {
-		this.serviceName = serviceName;
+	UnitBlacklist(String unitName) {
+		this.unitName = unitName;
 	}
 
-	public String getServiceName() {
-		return serviceName;
+	public String getUnitName() {
+		return unitName;
 	}
 }

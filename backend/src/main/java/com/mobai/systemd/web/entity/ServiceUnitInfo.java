@@ -10,15 +10,10 @@ package com.mobai.systemd.web.entity;
  * @param description 服务描述
  */
 public record ServiceUnitInfo(
-		// 服务名称
 		String unitName,
-		// 服务加载状态
 		String loadState,
-		// 服务运行状态
 		String activeState,
-		// 服务子状态
 		String subState,
-		// 服务描述
 		String description
 ) {
 }
