@@ -6,6 +6,7 @@ import com.mobai.systemd.web.entity.ServiceUnitOperation;
 import com.mobai.systemd.web.enums.Operation;
 import com.mobai.systemd.web.enums.ServiceFileContentBlacklist;
 import com.mobai.systemd.web.enums.UnitBlacklist;
+import com.mobai.systemd.web.enums.WantedByEnum;
 import com.mobai.systemd.web.service.SystemdService;
 import com.mobai.systemd.web.util.ExecUtil;
 import jakarta.servlet.http.HttpSession;
@@ -76,12 +77,7 @@ public class SystemdServiceImpl implements SystemdService {
 	@Override
 	public boolean operateServiceUnit(ServiceUnitOperation serviceUnitOperation) {
 		// 检查服务名是否合法
-		Pattern safeServiceName = Pattern.compile("^(?:[a-zA-Z0-9_.@-]|\\\\x[0-9a-fA-F]{2})+\\.service$");
-		// 检查服务黑名单
-		long serviceBlacklistCount = Arrays.stream(UnitBlacklist.values())
-				.filter(unitBlacklist -> unitBlacklist.getUnitName().equals(serviceUnitOperation.unitName()))
-				.count();
-		if (serviceBlacklistCount > 0 || !safeServiceName.matcher(serviceUnitOperation.unitName()).matches()) {
+		if (checkUnitName(serviceUnitOperation.unitName())) {
 			throw new SecurityException("Invalid ServiceName: " + serviceUnitOperation.unitName());
 		}
 		// 检查操作
@@ -119,6 +115,19 @@ public class SystemdServiceImpl implements SystemdService {
 		return newCommand.toArray(String[]::new);
 	}
 
+	/**
+	 * 检查服务名是否合法
+	 *
+	 * @param unitName 服务名
+	 */
+	private boolean checkUnitName(String unitName) {
+		Pattern safeServiceName = Pattern.compile("^(?:[a-zA-Z0-9_.@-]|\\\\x[0-9a-fA-F]{2})+\\.service$");
+		long serviceBlacklistCount = Arrays.stream(UnitBlacklist.values())
+				.filter(unitBlacklist -> unitBlacklist.getUnitName().equals(unitName))
+				.count();
+		return serviceBlacklistCount > 0 || !safeServiceName.matcher(unitName).matches();
+	}
+
 	@Override
 	public String getServiceTemplate(HttpSession session) {
 		try {
@@ -146,26 +155,29 @@ public class SystemdServiceImpl implements SystemdService {
 			throw new IllegalArgumentException("Invalid parameters");
 		}
 		// 检查服务名是否合法
-		Pattern safeServiceName = Pattern.compile("^(?:[a-zA-Z0-9_.@-]|\\\\x[0-9a-fA-F]{2})+\\.service$");
-		// 检查服务黑名单
-		long serviceBlacklistCount = Arrays.stream(UnitBlacklist.values())
-				.filter(unitBlacklist -> unitBlacklist.getUnitName().equals(serviceFile.unitName()))
-				.count();
-		if (serviceBlacklistCount > 0 || !safeServiceName.matcher(serviceFile.unitName()).matches()) {
+		if (checkUnitName(serviceFile.unitName())) {
 			throw new SecurityException("Invalid ServiceName: " + serviceFile.unitName());
 		}
 		// 检查最小条件
 		if (!serviceFile.content().contains("[Unit]")
 				|| !serviceFile.content().contains("[Service]")
 				|| !serviceFile.content().contains("ExecStart=")
-				|| !serviceFile.content().contains("[Install]")) {
+				|| !serviceFile.content().contains("[Install]")
+				|| !serviceFile.content().contains("WantedBy=")) {
 			LOG.error("Invalid service file: {}", serviceFile.unitName());
 			throw new IllegalArgumentException("Invalid service file: " + serviceFile.unitName());
 		}
 		long serviceFileBlacklistCount = Arrays.stream(ServiceFileContentBlacklist.values())
 				.filter(serviceFileBlacklist -> serviceFileBlacklist.find(serviceFile.content()))
 				.count();
-		if (serviceFileBlacklistCount > 0) {
+		// 检查 WantedBy
+		String wantedBy = serviceFile.content().lines()
+				.filter(line -> line.startsWith("WantedBy="))
+				.toString();
+		long count = Arrays.stream(WantedByEnum.values())
+				.filter(wantedByEnum -> wantedBy.contains(wantedByEnum.getValue()))
+				.count();
+		if (serviceFileBlacklistCount > 0 || count == 0) {
 			LOG.error("Invalid service file: {}", serviceFile.unitName());
 			throw new IllegalArgumentException("Invalid service file: " + serviceFile.unitName());
 		}
