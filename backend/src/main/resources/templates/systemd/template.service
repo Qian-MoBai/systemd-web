@@ -1,6 +1,6 @@
 [Unit]
 # 服务说明
-Description=
+#Description=
 # 在哪个服务后启动
 After=network.target
 
@@ -11,21 +11,22 @@ After=network.target
 # oneshot: 启动后会fork一个子进程，子进程结束后服务会停止
 Type=simple
 # 设置服务运行用户
-User=
+#User=
 # 运行用户组
-Group=
+#Group=
 # 启动命令 (绝对路径!!!)
 ExecStart=
 # 停止命令 (绝对路径!!!)
-ExecStop=
+#ExecStop=
 # 环境变量 (绝对路径!!!) 若有多个环境变量, 使用多个 Environment= 或 EnvironmentFile=
-Environment=
+#Environment=
 # 启动失败重启策略
-Restart=always
+#Restart=always
 # 启动失败重启间隔时间 (秒)
-RestartSec=
+#RestartSec=
 
 [Install]
-# 系统级为 multi-user.target
-# 用户级为 user.target
-WantedBy=
+# multi-user.target 多用户模式
+# graphical.target 图形化模式
+# default.target 默认模式
+WantedBy=default.target
