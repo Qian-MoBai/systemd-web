@@ -206,6 +206,8 @@ public class SystemdServiceImpl implements SystemdService {
 			LOG.error("Failed to write service file: {}", serviceFile.unitName());
 			throw new RuntimeException(e.getMessage());
 		}
+		// 移除已校验确保每次都是先获取模板再上传
+		session.removeAttribute("isGetTemplate");
 		// 重载 systemd
 		return ExecUtil.isCommandSuccessful(buildSystemdCommand(serviceFile.level(), new String[]{"systemctl", "daemon-reload"}));
 	}
