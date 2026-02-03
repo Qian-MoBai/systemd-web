@@ -1,5 +1,6 @@
 package com.mobai.systemd.web.controller;
 
+import com.mobai.systemd.web.entity.ResponseResult;
 import com.mobai.systemd.web.entity.ServiceFile;
 import com.mobai.systemd.web.entity.ServiceUnitInfo;
 import com.mobai.systemd.web.entity.ServiceUnitOperation;
@@ -7,6 +8,7 @@ import com.mobai.systemd.web.service.SystemdService;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,9 +33,9 @@ class SystemdController {
 	 * @return 服务单元列表
 	 */
 	@GetMapping
-	public List<ServiceUnitInfo> listServiceUnits(@RequestParam(value = "level", defaultValue = "system") String level) {
+	public ResponseResult<List<ServiceUnitInfo>> listServiceUnits(@RequestParam(value = "level", defaultValue = "system") String level) {
 		LOG.info("Listing service units for level: {}", level);
-		return systemdService.listServiceUnits(level);
+		return new ResponseResult<>(HttpStatus.OK, systemdService.listServiceUnits(level));
 	}
 
 	/**
@@ -43,9 +45,9 @@ class SystemdController {
 	 * @return 操作结果
 	 */
 	@PostMapping("/operation")
-	public boolean operateServiceUnit(@RequestBody ServiceUnitOperation serviceUnitOperation) {
+	public ResponseResult<Boolean> operateServiceUnit(@RequestBody ServiceUnitOperation serviceUnitOperation) {
 		LOG.info("Operating service unit: {}", serviceUnitOperation);
-		return systemdService.operateServiceUnit(serviceUnitOperation);
+		return new ResponseResult<>(HttpStatus.OK, systemdService.operateServiceUnit(serviceUnitOperation));
 	}
 
 	/**
@@ -55,9 +57,9 @@ class SystemdController {
 	 * @return 服务模板
 	 */
 	@GetMapping("/template")
-	public String getServiceTemplate(HttpSession session) {
+	public ResponseResult<String> getServiceTemplate(HttpSession session) {
 		LOG.info("Getting service template");
-		return systemdService.getServiceTemplate(session);
+		return new ResponseResult<>(HttpStatus.OK, systemdService.getServiceTemplate(session));
 	}
 
 	/**
@@ -68,8 +70,8 @@ class SystemdController {
 	 * @return 上传结果
 	 */
 	@PostMapping("/upload")
-	public boolean uploadService(HttpSession session, @RequestBody ServiceFile serviceFile) {
+	public ResponseResult<Boolean> uploadService(HttpSession session, @RequestBody ServiceFile serviceFile) {
 		LOG.info("Uploading service: {}", serviceFile);
-		return systemdService.uploadService(session, serviceFile);
+		return new ResponseResult<>(HttpStatus.OK, systemdService.uploadService(session, serviceFile));
 	}
 }
