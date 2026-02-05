@@ -59,6 +59,9 @@ public class SystemdServiceImpl implements SystemdService {
 					.map(line -> {
 						// 过滤多余的空格并创建 ServiceUnitInfo 对象
 						String[] parts = line.trim().split("\\s+");
+						if ("●".equals(parts[0])) {
+							parts = Arrays.copyOfRange(parts, 1, parts.length);
+						}
 						return new ServiceUnitInfo(
 								parts[0],
 								parts[1],
