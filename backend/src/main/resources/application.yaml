@@ -3,7 +3,7 @@ spring:
     name: backend
 systemd:
   service:
-    system: /etc/systemd/system/
+    system: /usr/lib/systemd/system/
     user:
       home: ""
       path: /.config/systemd/user/
