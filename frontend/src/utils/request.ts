@@ -8,7 +8,7 @@ const instance: AxiosInstance = axios.create({
 })
 
 instance.interceptors.response.use(
-  (response) => {
+  (response): any => {
     const resp = response.data as ResponseData
     if (resp.code === 500) {
       ElMessage.error(resp.message)
