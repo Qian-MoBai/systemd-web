@@ -20,6 +20,10 @@ const uploadLoading = ref(false)
 // 搜索相关状态
 const searchKeyword = ref('')
 const searchField = ref('all')
+// 分页相关状态
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalItems = ref(0)
 
 // 表单数据
 const uploadForm = ref<ServiceFile>({
@@ -42,7 +46,6 @@ const operations = [
 const searchFields = [
   { value: 'all', label: '全部' },
   { value: 'unitFile', label: '服务名称' },
-  { value: 'description', label: '服务描述' },
   { value: 'state', label: '加载状态' },
   { value: 'preset', label: '运行状态' },
 ]
@@ -74,12 +77,27 @@ const filteredServiceUnits = computed(() => {
   })
 })
 
+// 计算属性：当前页显示的数据
+const paginatedServiceUnits = computed(() => {
+  const startIndex = (currentPage.value - 1) * pageSize.value
+  const endIndex = startIndex + pageSize.value
+  return filteredServiceUnits.value.slice(startIndex, endIndex)
+})
+
+// 计算总条目数（用于分页组件）
+const computedTotal = computed(() => {
+  return filteredServiceUnits.value.length
+})
+
 // 获取服务列表
 const fetchServiceUnits = async () => {
   try {
     loading.value = true
     const resp = await getServiceUnits(level.value)
     serviceUnits.value = resp.data
+    // 重置分页
+    currentPage.value = 1
+    totalItems.value = serviceUnits.value.length
     // 清空搜索关键词
     searchKeyword.value = ''
   } catch (error) {
@@ -181,7 +199,8 @@ const openUploadDialog = () => {
 
 // 处理搜索
 const handleSearch = () => {
-  // 搜索逻辑已经在computed中实现，这里可以添加额外的处理
+  // 搜索后重置到第一页
+  currentPage.value = 1
   console.log('搜索关键词:', searchKeyword.value)
   console.log('搜索字段:', searchField.value)
 }
@@ -189,6 +208,18 @@ const handleSearch = () => {
 // 清空搜索
 const clearSearch = () => {
   searchKeyword.value = ''
+  // 清空搜索后重置到第一页
+  currentPage.value = 1
+}
+
+// 处理分页变化
+const handlePageChange = (page: number) => {
+  currentPage.value = page
+}
+
+const handleSizeChange = (size: number) => {
+  pageSize.value = size
+  currentPage.value = 1 // 改变每页大小时回到第一页
 }
 
 // 初始化
@@ -271,13 +302,18 @@ onMounted(() => {
         </template>
 
         <el-table
-          :data="filteredServiceUnits"
+          :data="paginatedServiceUnits"
           border
           stripe
           :loading="loading"
           class="services-table"
         >
-          <el-table-column type="index" width="60" label="#" align="center" />
+          <!-- 修改序号列：使用计算属性生成正确的分页序号 -->
+          <el-table-column width="60" label="#" align="center">
+            <template #default="{ $index }">
+              {{ $index + 1 + (currentPage - 1) * pageSize }}
+            </template>
+          </el-table-column>
           <el-table-column prop="unitFile" label="服务名称" min-width="200" />
           <el-table-column prop="state" label="加载状态" width="120" align="center">
             <template #default="{ row }">
@@ -337,6 +373,21 @@ onMounted(() => {
             </template>
           </el-table-column>
         </el-table>
+
+        <!-- 分页组件 -->
+        <div class="pagination-container">
+          <el-pagination
+            v-model:current-page="currentPage"
+            v-model:page-size="pageSize"
+            :page-sizes="[5, 10, 20, 50]"
+            :total="computedTotal"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="handleSizeChange"
+            @current-change="handlePageChange"
+            background
+            class="custom-pagination"
+          />
+        </div>
       </el-card>
     </div>
 
@@ -495,11 +546,34 @@ onMounted(() => {
 
 .services-table {
   border-radius: 4px;
+  margin-bottom: 20px;
 }
 
 .services-table :deep(.el-table__header th) {
   background-color: #f8f9fa;
   font-weight: 500;
+}
+
+/* 分页容器 */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+  background-color: #fafafa;
+  border-top: 1px solid #ebeef5;
+  border-radius: 0 0 8px 8px;
+}
+
+.custom-pagination :deep(.el-pagination__total) {
+  font-weight: 500;
+}
+
+.custom-pagination :deep(.el-pagination__sizes) {
+  margin-left: 15px;
+}
+
+.custom-pagination :deep(.el-pagination__jump) {
+  margin-left: 15px;
 }
 
 /* 表格操作按钮 */
@@ -586,6 +660,10 @@ onMounted(() => {
   .header-info {
     align-items: center;
   }
+
+  .pagination-container {
+    padding: 15px 0;
+  }
 }
 
 @media (max-width: 768px) {
@@ -632,6 +710,18 @@ onMounted(() => {
   .more-actions-btn {
     flex: 1;
     min-width: auto;
+  }
+
+  .pagination-container {
+    padding: 10px 0;
+  }
+
+  .custom-pagination :deep(.el-pagination__sizes) {
+    margin-left: 8px;
+  }
+
+  .custom-pagination :deep(.el-pagination__jump) {
+    margin-left: 8px;
   }
 }
 
