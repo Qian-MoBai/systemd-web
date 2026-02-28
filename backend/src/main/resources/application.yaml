@@ -1,3 +1,9 @@
 spring:
   application:
     name: backend
+systemd:
+  service:
+    system: /usr/lib/systemd/system/
+    user:
+      home: ""
+      path: /.config/systemd/user/
