@@ -1,18 +1,14 @@
 /** 服务单元信息 */
 export type ServiceUnitInfo = {
-  /** 服务单元名称 */
-  unitName: string
+  /** 服务文件名称 */
+  unitFile: string
   /** 服务加载状态 */
-  loadState: string
+  state: string
   /** 服务运行状态 */
-  activeState: string
-  /** 服务子状态 */
-  subState: string
-  /** 服务描述 */
-  description: string
+  preset: string
 }
 
-/**  服务单元操作 */
+/** 服务单元操作 */
 export type ServiceUnitOperation = {
   /** 系统级别 */
   level: string
