@@ -136,7 +136,7 @@ const handleOperateService = async (unitFile: string, operation: string) => {
     const resp = await operateServiceUnit(operationData)
     if (resp.data) {
       ElMessage.success('操作成功')
-      fetchServiceUnits() // 刷新列表
+      fetchServiceUnits()
     }
   } catch (error: any) {
     if (error !== 'cancel') {
@@ -181,7 +181,7 @@ const handleUploadService = async () => {
       ElMessage.success('服务上传成功')
       uploadDialogVisible.value = false
       uploadForm.value = { level: 'system', unitName: '', content: '' }
-      fetchServiceUnits() // 刷新列表
+      fetchServiceUnits()
     }
   } catch (error) {
     ElMessage.error('服务上传失败')
@@ -219,7 +219,8 @@ const handlePageChange = (page: number) => {
 
 const handleSizeChange = (size: number) => {
   pageSize.value = size
-  currentPage.value = 1 // 改变每页大小时回到第一页
+  // 改变每页大小时回到第一页
+  currentPage.value = 1
 }
 
 // 初始化
@@ -241,7 +242,6 @@ onMounted(() => {
               <el-option label="用户级" value="user" />
             </el-select>
           </div>
-
           <div class="search-container">
             <span class="label">搜索:</span>
             <el-select v-model="searchField" class="search-field-select" placeholder="选择搜索字段">
@@ -274,7 +274,6 @@ onMounted(() => {
             </el-button>
           </div>
         </div>
-
         <div class="action-buttons">
           <el-button type="success" @click="openUploadDialog" class="action-btn">
             上传服务
@@ -285,7 +284,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
     <!-- 服务列表 -->
     <div class="services-section">
       <el-card class="services-card">
@@ -300,7 +298,6 @@ onMounted(() => {
             </div>
           </div>
         </template>
-
         <el-table
           :data="paginatedServiceUnits"
           border
@@ -373,7 +370,6 @@ onMounted(() => {
             </template>
           </el-table-column>
         </el-table>
-
         <!-- 分页组件 -->
         <div class="pagination-container">
           <el-pagination
@@ -390,14 +386,12 @@ onMounted(() => {
         </div>
       </el-card>
     </div>
-
     <!-- 上传服务对话框 -->
     <el-dialog v-model="uploadDialogVisible" title="上传服务" width="700px" class="upload-dialog">
       <div class="upload-header">
         <el-button @click="handleGetTemplate" type="primary" size="small"> 获取模板 </el-button>
         <p class="template-tip">请先获取模板，然后修改相应内容</p>
       </div>
-
       <el-form :model="uploadForm" label-width="100px">
         <el-form-item label="服务名称">
           <el-input
@@ -405,7 +399,6 @@ onMounted(() => {
             placeholder="请输入服务文件名（必须以.service结尾）"
           />
         </el-form-item>
-
         <el-form-item label="服务内容">
           <el-input
             v-model="uploadForm.content"
@@ -416,7 +409,6 @@ onMounted(() => {
           />
         </el-form-item>
       </el-form>
-
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="uploadDialogVisible = false">取消</el-button>
@@ -428,7 +420,6 @@ onMounted(() => {
     </el-dialog>
   </div>
 </template>
-
 <style scoped>
 .systemd-container {
   padding: 20px;
@@ -725,7 +716,7 @@ onMounted(() => {
   }
 }
 
-/* 搜索高亮效果（可选） */
+/* 搜索高亮效果 */
 .search-highlight {
   background-color: #ffff00;
   padding: 1px 2px;

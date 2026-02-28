@@ -6,29 +6,31 @@ import request from '@/utils/request'
  * @param level 运行级别
  */
 export const getServiceUnits = (level: string): Promise<ResponseData<ServiceUnitInfo[]>> => {
-  return request({ 
-    method: 'get', 
-    url: '/systemd/service', 
-    params: { level } 
+  return request({
+    method: 'get',
+    url: '/systemd/service',
+    params: { level },
   })
 }
 
 /** 操作服务单元
  * @param operation 操作参数
  */
-export const operateServiceUnit = (operation: ServiceUnitOperation): Promise<ResponseData<boolean>> => {
-  return request({ 
-    method: 'post', 
+export const operateServiceUnit = (
+  operation: ServiceUnitOperation,
+): Promise<ResponseData<boolean>> => {
+  return request({
+    method: 'post',
     url: '/systemd/service/operation',
-    data: operation
+    data: operation,
   })
 }
 
 /** 获取服务模板 */
 export const getServiceTemplate = (): Promise<ResponseData<string>> => {
-  return request({ 
-    method: 'get', 
-    url: '/systemd/service/template'
+  return request({
+    method: 'get',
+    url: '/systemd/service/template',
   })
 }
 
@@ -36,9 +38,9 @@ export const getServiceTemplate = (): Promise<ResponseData<string>> => {
  * @param serviceFile 服务文件信息
  */
 export const uploadService = (serviceFile: ServiceFile): Promise<ResponseData<boolean>> => {
-  return request({ 
-    method: 'post', 
+  return request({
+    method: 'post',
     url: '/systemd/service/upload',
-    data: serviceFile
+    data: serviceFile,
   })
 }
