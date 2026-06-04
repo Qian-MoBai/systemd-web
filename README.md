@@ -43,6 +43,7 @@ Systemd Web 是一个基于Web的systemd服务管理平台，提供图形化界�
 - Java 25
 - Maven 3.6+
 - systemd 系统
+- 依赖 pkexec
 
 ## 快速开始
 
