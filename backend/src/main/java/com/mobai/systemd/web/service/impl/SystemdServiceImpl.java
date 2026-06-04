@@ -100,7 +100,7 @@ public class SystemdServiceImpl implements SystemdService {
 		switch (level) {
 			case "system" -> {
 				List<String> temp = new ArrayList<>(Arrays.asList(command));
-				temp.addFirst("sudo");
+				temp.addFirst("pkexec");
 				newCommand = temp;
 			}
 			case "user" -> {
